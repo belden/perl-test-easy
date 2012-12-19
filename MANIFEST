@@ -1,0 +1,11 @@
+MANIFEST
+README.md
+t/basic.t
+t/all.t
+t/hash.t
+t/data-driven.t
+t/assert-on-non-scalar-refs.t
+lib/Test/Facile/DataDriven.pm
+lib/Test/Facile.pm
+Makefile.PL
+LICENSE
