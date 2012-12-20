@@ -12,7 +12,7 @@ use Carp qw(confess);
 use Test::Resub;
 use Test::Facile::DataDriven;
 
-our $VERSION = 1.03;
+our $VERSION = 1.04;
 
 ## spend a little time moving things around into @EXPORT, @EXPORT_OK
 our @EXPORT = qw(nearly_ok each_ok deep_ok);
@@ -73,6 +73,9 @@ sub deep_equal {
 
 sub deep_ok ($$;$) {
   my ($got, $exp, $message) = @_;
+
+  my $dump_got = Data::Denter::Denter($got);
+  my $dump_exp = Data::Denter::Denter($exp);
 
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::ok( deep_equal($got, $exp), $message ) || do {
