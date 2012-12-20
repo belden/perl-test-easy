@@ -10,6 +10,7 @@ WriteMakefile(
 	PL_FILES => {},
 	PREREQ_PM => {
 		'Test::More' => 0,
+		'Functional::Utility' => 0,
 	},
 	META_MERGE => {
 		resources => {

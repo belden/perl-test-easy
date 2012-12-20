@@ -12,7 +12,7 @@ use Carp qw(confess);
 use Test::Resub;
 use Test::Facile::DataDriven;
 
-our $VERSION = 1.01;
+our $VERSION = 1.03;
 
 ## spend a little time moving things around into @EXPORT, @EXPORT_OK
 our @EXPORT = qw(nearly_ok each_ok deep_ok);

@@ -27,7 +27,7 @@ use Test::Facile::DataDriven qw(run_where);
 
   like(
     $error,
-    qr{error: you gave me a bare scalar - give me a scalar reference instead at.*?Test/DataDriven.pm line \d+.*eval \{\.\.\.\} called at.*? line \d+}sm,
+    qr{error: you gave me a bare scalar - give me a scalar reference instead at.*?Test/Facile/DataDriven.pm line \d+.*eval \{\.\.\.\} called at.*? line \d+}sm,
     'Asserted with a somewhat-helpful stacktrace on weird args'
   );
 }
