@@ -10,6 +10,7 @@ use Carp qw(confess);
 
 # this module re-exports functions from these modules
 use Test::Resub;
+use Test::Facile::Time;
 use Test::Facile::DataDriven;
 
 our $VERSION = 1.04;
@@ -17,7 +18,7 @@ our $VERSION = 1.04;
 ## spend a little time moving things around into @EXPORT, @EXPORT_OK
 our @EXPORT = qw(nearly_ok each_ok deep_ok);
 our @EXPORT_OK = qw(nearly test_sub match deep_equal);
-foreach my $supplier (qw(Test::Resub Test::Facile::DataDriven)) {
+foreach my $supplier (qw(Test::Resub Test::Facile::DataDriven Test::Facile::Time)) {
 	no strict 'refs';
 	push @EXPORT, @{"$supplier\::EXPORT"};
 	push @EXPORT_OK, @{"$supplier\::EXPORT_TAGS"};
