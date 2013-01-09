@@ -8,7 +8,7 @@ use Test::More tests => 3;
 use lib grep { -d } qw(./lib ../lib);
 use Test::Facile;
 
-my $some_epoch = rand(time);
+my $some_epoch = rand(CORE::time);
 my $some_localtime = localtime($some_epoch);
 
 ok( time_nearly($some_localtime, $some_epoch - 2, 5), "$some_localtime is within 5 seconds of itself minus 2" );
