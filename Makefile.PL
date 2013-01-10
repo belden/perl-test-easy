@@ -11,6 +11,9 @@ WriteMakefile(
 	PREREQ_PM => {
 		'Test::More' => 0,
 		'Functional::Utility' => 0,
+		'Data::Denter' => 0,
+		'Text::Diff' => 0,
+		'Scalar::Util' => 0,
 	},
 	META_MERGE => {
 		resources => {
