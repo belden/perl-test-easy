@@ -11,7 +11,7 @@ use Test::Facile;
 subtest basic => sub {
 	diag "Answer the basic question of, 'Is this time within X seconds of this date?'";
 
-	my $some_epoch = rand(CORE::time);
+	my $some_epoch = int rand(time);
 	my $some_localtime = localtime($some_epoch);
 	ok( time_nearly($some_localtime, $some_epoch - 2, 5) );
 
@@ -41,6 +41,31 @@ subtest pluggable => sub {
 	ok( time_nearly('22531104000003', $random_midnight, 5) );
 };
 
+subtest deep_ok => sub {
+  diag 'Show how time_nearly() plays with deep_ok()';
+
+	my $some_epoch = int rand(time);
+	my $some_date  = localtime $some_epoch;
+	my $future_now = $some_epoch + 10;
+	my $epsilon    = 15;
+
+	my %got = (
+		create_time => $some_date,
+		name => 'maternal-Edam',
+	);
+
+	my %exp = (
+		create_time => around_about($future_now, $epsilon),
+		name => 'maternal-Edam',
+	);
+
+	isnt( $got{create_time}, $exp{create_time}, "'$got{create_time}' is not the same as '$future_now'..." );
+	deep_ok( \%got, \%exp, "...yet we can treat them as equivalent, and within $epsilon seconds of each other!" );
+
+	my $now = localtime;
+	my $time = time;
+	deep_ok( [$now], [around_about($time, 0)], "'$now' is within 0 seconds of epoch time '$time'" );
+};
+
 # todo:
-# * make this work with deep_ok
 # * some notion about error messaging

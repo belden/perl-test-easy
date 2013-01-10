@@ -8,17 +8,22 @@ use warnings;
 require Test::More;
 use Carp qw(confess);
 
+# non-core modules
+use Data::Denter ();
+use Text::Diff ();
+
 # this module re-exports functions from these modules
 use Test::Resub;
 use Test::Facile::Time;
 use Test::Facile::DataDriven;
+use Test::Facile::DeepEqual qw(deep_equal);
 
 our $VERSION = 1.04;
 
 ## spend a little time moving things around into @EXPORT, @EXPORT_OK
-our @EXPORT = qw(nearly_ok each_ok deep_ok);
-our @EXPORT_OK = qw(nearly test_sub match deep_equal);
-foreach my $supplier (qw(Test::Resub Test::Facile::DataDriven Test::Facile::Time)) {
+our @EXPORT = qw(nearly_ok each_ok deep_ok around_about);
+our @EXPORT_OK = qw(nearly test_sub match);
+foreach my $supplier (qw(Test::Resub Test::Facile::DataDriven Test::Facile::Time Test::Facile::DeepEqual)) {
 	no strict 'refs';
 	push @EXPORT, @{"$supplier\::EXPORT"};
 	push @EXPORT_OK, @{"$supplier\::EXPORT_TAGS"};
@@ -55,6 +60,16 @@ sub nearly {
 	return !!$close;
 }
 
+sub around_about {
+	my ($now, $epsilon) = @_;
+	return Test::Facile::utils::tester->new(
+		test => sub {
+			my ($got) = @_;
+			return time_nearly($got, $now, $epsilon);
+		},
+	);
+}
+
 sub test_sub (&) {
   my $test = shift;
   return sub {
@@ -63,23 +78,14 @@ sub test_sub (&) {
   };
 }
 
-sub deep_equal {
-	my ($got, $exp) = @_;
-
-  my $dump_got = Data::Denter::Denter($got);
-  my $dump_exp = Data::Denter::Denter($exp);
-
-	return $dump_got eq $dump_exp;
-}
-
 sub deep_ok ($$;$) {
   my ($got, $exp, $message) = @_;
 
-  my $dump_got = Data::Denter::Denter($got);
-  my $dump_exp = Data::Denter::Denter($exp);
-
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::ok( deep_equal($got, $exp), $message ) || do {
+		my $dump_got = Data::Denter::Denter($got);
+		my $dump_exp = Data::Denter::Denter($exp);
+
     Test::More::diag '$GOT';
     Test::More::diag $dump_got;
     Test::More::diag '$EXPECTED';
