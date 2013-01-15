@@ -1,11 +1,11 @@
-package Test::Facile::DeepEqual;
+package Test::Easy::DeepEqual;
 use base qw(Exporter);
 
 use strict;
 use warnings;
 
 use Scalar::Util qw(blessed);
-use Test::Facile::utils::tester;
+use Test::Easy::utils::tester;
 
 our @EXPORT_OK = qw(deep_equal);
 
@@ -88,7 +88,7 @@ sub _same_values {
 	my ($ref_got, $ref_exp) = map { ref } $got, $exp;
 	my $checker = _is_a_checker($exp)
 		? $exp
-		: Test::Facile::utils::tester->new(
+		: Test::Easy::utils::tester->new(
 			test => sub {
 				my ($got) = @_;
 				return "$got" eq "$exp";

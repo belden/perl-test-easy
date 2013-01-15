@@ -1,4 +1,4 @@
-package Test::Facile::DataDriven;
+package Test::Easy::DataDriven;
 use base qw(Exporter);
 
 use strict;
@@ -96,13 +96,13 @@ __END__
 
 =head1 NAME
 
-Test::Facile::DataDriven - express your test conditions in a data-driven manner
+Test::Easy::DataDriven - express your test conditions in a data-driven manner
 
 =head1 SYNOPSIS
 
 This is one of the tests for this module, and shows what this module provides:
 
-    use Test::Facile::DataDriven qw(run_where);
+    use Test::Easy::DataDriven qw(run_where);
 
     my $foo = 'foo value';
     my $bar = sub { uc(shift()) };
@@ -136,7 +136,7 @@ Being able to gloss away the notion of "set these variables to these values for 
 back to their previous values" makes your tests more legible, and exposes duplicative - or worse yet, uncovered - test
 conditions.
 
-Here's an example of an admittedly synthetic test which doesn't use Test::Facile::DataDriven's run_where():
+Here's an example of an admittedly synthetic test which doesn't use Test::Easy::DataDriven's run_where():
 
 First, here's the code under test
 
@@ -211,8 +211,8 @@ The second set of tests also show that we've missed testing one condition, viz:
 
 In practice I tend to express these four tests in a more compact fashion:
 
-    use Test::Facile qw(each_ok);
-    use Test::Facile::DataDriven qw(run_where);
+    use Test::Easy qw(each_ok);
+    use Test::Easy::DataDriven qw(run_where);
 
     each_ok {                                            # Apply this block to the following list and run tests on return values.
         my $got = run_where(                             # locally set vars as I've declared, then run this code to generate a $got

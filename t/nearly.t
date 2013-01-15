@@ -6,7 +6,7 @@ use warnings;
 use Test::More tests => 2;
 
 use lib grep { -d } qw(./lib ../lib);
-use Test::Facile;
+use Test::Easy;
 
 subtest basic => sub {
 	diag "Answer the basic question of, 'Is this time within X seconds of this date?'";
@@ -24,7 +24,7 @@ subtest basic => sub {
 subtest pluggable => sub {
 	diag 'Illustrate how to plug in support for other time formats';
 
-	Test::Facile::Time->add_format(
+	Test::Easy::Time->add_format(
 		_description => 'CCYYMMDDhhmmss',
 		format_epoch_seconds => sub {
 			my ($sec, $min, $hour, $mday, $month, $year) = localtime($_);

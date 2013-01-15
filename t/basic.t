@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Test::More tests => 5;
-use Test::Facile::DataDriven qw(run_where);
+use Test::Easy::DataDriven qw(run_where);
 
 my $foo = 'foo value';
 my $bar = sub { uc(shift()) };

@@ -1,10 +1,10 @@
-package Test::Facile::Time;
+package Test::Easy::Time;
 use base qw(Exporter);
 
 use strict;
 use warnings;
 
-require Test::Facile;
+require Test::Easy;
 
 our @EXPORT = qw(time_nearly);
 
@@ -33,7 +33,7 @@ sub time_nearly {
 	}
 
 	return 0 unless defined $guess;
-	return Test::Facile::nearly($guess, $expected, $epsilon);
+	return Test::Easy::nearly($guess, $expected, $epsilon);
 }
 
 1;
