@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More tests => 3;
 use lib grep { -d $_ } qw(./lib ../lib);
-use Test::Facile::DataDriven qw(run_where);
+use Test::Easy::DataDriven qw(run_where);
 
 my %hash = (1..10);
 is_deeply( \%hash, {1..10}, 'sanity' );

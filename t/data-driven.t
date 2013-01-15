@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Test::More tests => 11;
-use Test::Facile::DataDriven qw(run_where);
+use Test::Easy::DataDriven qw(run_where);
 
 {
 	my ($foo, $bar, $baz) = (1, sub { 2 }, [3]);

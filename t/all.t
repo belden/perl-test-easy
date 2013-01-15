@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More tests => 21;
 use lib grep { -d $_ } qw(./lib ../lib);
-use Test::Facile::DataDriven qw(run_where);
+use Test::Easy::DataDriven qw(run_where);
 
 # toss an error if your left-arg isn't a scalar ref
 {
@@ -28,7 +28,7 @@ use Test::Facile::DataDriven qw(run_where);
 
   like(
     $error,
-    qr{error: you gave me a bare scalar - give me a scalar reference instead at.*?Test/Facile/DataDriven.pm line \d+.*eval \{\.\.\.\} called at.*? line \d+}sm,
+    qr{error: you gave me a bare scalar - give me a scalar reference instead at.*?Test/Easy/DataDriven.pm line \d+.*eval \{\.\.\.\} called at.*? line \d+}sm,
     'Asserted with a somewhat-helpful stacktrace on weird args'
   );
 }

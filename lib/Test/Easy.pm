@@ -1,4 +1,4 @@
-package Test::Facile;
+package Test::Easy;
 use base qw(Exporter);
 
 use strict;
@@ -14,16 +14,16 @@ use Text::Diff ();
 
 # this module re-exports functions from these modules
 use Test::Resub;
-use Test::Facile::Time;
-use Test::Facile::DataDriven;
-use Test::Facile::DeepEqual qw(deep_equal);
+use Test::Easy::Time;
+use Test::Easy::DataDriven;
+use Test::Easy::DeepEqual qw(deep_equal);
 
 our $VERSION = 1.04;
 
 ## spend a little time moving things around into @EXPORT, @EXPORT_OK
 our @EXPORT = qw(nearly_ok each_ok deep_ok around_about);
 our @EXPORT_OK = qw(nearly test_sub match);
-foreach my $supplier (qw(Test::Resub Test::Facile::DataDriven Test::Facile::Time Test::Facile::DeepEqual)) {
+foreach my $supplier (qw(Test::Resub Test::Easy::DataDriven Test::Easy::Time Test::Easy::DeepEqual)) {
 	no strict 'refs';
 	push @EXPORT, @{"$supplier\::EXPORT"};
 	push @EXPORT_OK, @{"$supplier\::EXPORT_TAGS"};
@@ -34,7 +34,7 @@ our %EXPORT_TAGS = (
 	helpers => [@EXPORT_OK],
 	all => [@EXPORT, @EXPORT_OK],
 );
-foreach my $supplier (qw(Test::Resub Test::Facile::DataDriven)) {
+foreach my $supplier (qw(Test::Resub Test::Easy::DataDriven)) {
 	no strict 'refs';
 	%EXPORT_TAGS = _merge(%EXPORT_TAGS, %{"$supplier\::EXPORT_TAGS"});
 }
@@ -62,7 +62,15 @@ sub nearly {
 
 sub around_about {
 	my ($now, $epsilon) = @_;
-	return Test::Facile::utils::tester->new(
+
+	$epsilon ||= 0;
+
+	return Test::Easy::utils::tester->new(
+		raw  => [$now, $epsilon],
+		explain => sub {
+			my ($got, $raw) = @_;
+			return sprintf '%s within %s seconds of %s', $got, reverse @$raw;
+		},
 		test => sub {
 			my ($got) = @_;
 			return time_nearly($got, $now, $epsilon);
@@ -83,6 +91,7 @@ sub deep_ok ($$;$) {
 
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::ok( deep_equal($got, $exp), $message ) || do {
+		$_ = clone_and_mutate_for_diag($_) foreach $got, $exp;
 		my $dump_got = Data::Denter::Denter($got);
 		my $dump_exp = Data::Denter::Denter($exp);
 
@@ -91,12 +100,15 @@ sub deep_ok ($$;$) {
     Test::More::diag '$EXPECTED';
     Test::More::diag $dump_exp;
 
-    my $diff = Text::Diff::diff(\$dump_got, \$dump_exp, {CONTEXT => 2**31});
+    my $diff = Text::Diff::diff(\$dump_exp, \$dump_got, {CONTEXT => 2**31});
     $diff =~ s/^\@\@.*\@\@\n//;
-    Test::More::diag "\n\nDIFF\n- \$GOT\n+ \$EXPECTED\n";
+    Test::More::diag "\n\nDIFF\n+ \$GOT\n- \$EXPECTED\n";
     Test::More::diag $diff;
   };
 }
+
+# lame placeholder
+sub clone_and_mutate_for_diag { shift }
 
 sub each_ok (&@) {
 	my $code = shift;
@@ -154,11 +166,11 @@ __END__
 
 =head1 NAME
 
-Test::Facile - facilitates easy testing patterns
+Test::Easy - facilitates easy testing patterns
 
 =head1 SYNOPSIS
 
-    use Test::Facile qw(nearly_ok nearly each_ok);
+    use Test::Easy qw(nearly_ok nearly each_ok);
 
     # prove that $got is within $epsilon of $expected
     nearly_ok( 1, 1.25, .7, '1 is within .7 of 1.25' );
