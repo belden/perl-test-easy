@@ -78,11 +78,15 @@ sub test_sub (&) {
   };
 }
 
+sub clone_and_mutate_for_diff { @_ }
+
 sub deep_ok ($$;$) {
   my ($got, $exp, $message) = @_;
 
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::ok( deep_equal($got, $exp), $message ) || do {
+		($got, $exp) = clone_and_mutate_for_diff($got, $exp);
+		
 		my $dump_got = Data::Denter::Denter($got);
 		my $dump_exp = Data::Denter::Denter($exp);
 

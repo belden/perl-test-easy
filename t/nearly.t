@@ -8,6 +8,8 @@ use Test::More tests => 2;
 use lib grep { -d } qw(./lib ../lib);
 use Test::Easy;
 
+# todo: make it easy to set a test-wide epsilon (logan)
+
 subtest basic => sub {
 	diag "Answer the basic question of, 'Is this time within X seconds of this date?'";
 
@@ -43,6 +45,7 @@ subtest pluggable => sub {
 
 subtest deep_ok => sub {
   diag 'Show how time_nearly() plays with deep_ok()';
+	plan tests => 3;
 
 	my $some_epoch = int rand(time);
 	my $some_date  = localtime $some_epoch;
@@ -69,3 +72,35 @@ subtest deep_ok => sub {
 
 # todo:
 # * some notion about error messaging
+
+subtest tdd_ok => sub {
+	diag 'we produce meaningful output for tdd developers';
+	plan tests => 1;
+
+	my $some_epoch = int rand(time);
+	my $some_date  = localtime $some_epoch;
+	my $future_now = $some_epoch + 10;
+	my $epsilon    = 15;
+
+	my %got = (
+		foo => 'bar',
+		create_time => $some_date,
+		name => 'maternal-Edam',
+	);
+
+	my %exp = (
+		# foo => 'not here',
+		create_time => around_about($future_now, $epsilon),
+		name => 'maternal-Edam',
+	);
+
+	deep_ok( \%got, \%exp, "...yet we can treat them as equivalent, and within $epsilon seconds of each other!" );
+
+
+	# the maxwell-smart approach: "you missed it by this much"
+	deep_ok( \%got, +{
+		# foo => 'not here',
+		create_time => around_about($future_now, $epsilon),
+		name => 'maternal-Edam',
+	}, "and if equivalence is too far off, we represent that nice enough" );
+};
