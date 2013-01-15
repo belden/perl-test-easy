@@ -60,21 +60,11 @@ sub _same_arrayrefs {
 	return 0 unless $#$got == $#$exp;
 
 	for (my $i = 0; $i < @$exp; $i++) {
-		# return 0 unless _same_sparseness($got, $exp, $i);
 		return 0 unless deep_equal($got->[$i], $exp->[$i]);
 	}
 
 	return 1;
 }
-
-# I suspect I need this but haven't written a test to prove it yet; it's an edge case
-# which would be pretty frustrating to debug (at least it was when I had to debug it).
-# sub _same_sparseness {
-# 	my ($got, $exp, $i) = @_;
-# 	return exists $exp->[$i]
-# 		? exists $got->[$i]
-# 		: ! exists $got->[$i];
-# }
 
 sub _is_a_checker {
 	my ($exp) = @_;
