@@ -6,88 +6,88 @@ use warnings;
 
 use Carp qw(confess);
 use Scalar::Util qw(blessed);
+use Hash::MostUtils qw(lkeys);
 use Functional::Utility qw(hook_run);
 
-our $VERSION = 1.01;
 our @EXPORT_OK = qw(run_where);
 
-sub _copy {
-  my ($thing) = @_;
-
-  my $ref = ref($thing);
-  confess "don't know how to copy a $ref" if blessed($thing);
-	confess "error: you gave me a bare scalar - give me a scalar reference instead" if ! $ref;
-	confess "error: you gave me a code reference - give me a reference to it instead" if $ref eq 'CODE';
-
-  my %copiers = (
-		REF    => sub { \$$thing },
-    HASH   => sub { +{%$thing} },
-    ARRAY  => sub { [@$thing] },
-    SCALAR => sub { \$$thing },
-  );
-  confess "don't know how to handle a $ref :(" if ! exists $copiers{$ref};
-  return $copiers{$ref}->();
-}
-
-sub _reref {
-	my $ref = shift;
-	return +{
-		REF    => sub { $_[0] },
-		HASH   => sub { +{@_} },
-		ARRAY  => sub { [@_] },
-		SCALAR => sub { $_[0] },
-	}->{$ref}->(@_);
-}
-
-sub _deref {
-  my ($thing) = @_;
-
-  my $ref = ref($thing);
-  confess "don't know how to dereference a $ref" if blessed($thing);
-	confess "error: you gave me a bare scalar - give me a scalar reference instead" if ! $ref;
-	confess "error: you gave me a code reference - give me a reference to it instead" if $ref eq 'CODE';
-
-  my %dereferencers = (
-		REF    => sub { $$thing },
-    HASH   => sub { %$thing },
-    ARRAY  => sub { @$thing },
-    SCALAR => sub { $$thing },
-  );
-  confess "don't know how to handle a $ref :(" if ! exists $dereferencers{$ref};
-  return $dereferencers{$ref}->();
-}
-
-sub _set_ref {
-	my ($ref, $data, $raw) = @_;
-
-	+{
-		REF    => sub { $$ref = $data },
-		HASH   => sub { %$ref = %$data },
-		ARRAY  => sub { @$ref = @$data },
-		SCALAR => sub { $$ref = $data },
-	}->{ref($ref)}->();
-
-	return;
+sub y_combinator (&) {
+	my $curried = shift;
+	return sub {
+		my $f1 = shift;
+		return $curried->(sub { $f1->($f1)(@_) })
+	}->(sub {
+		my $f2 = shift;
+		return $curried->(sub { $f2->($f2)(@_) });
+	});
 }
 
 sub run_where {
-  my $code = pop;
+	my $code = pop;
+	my (@where) = @_;
 
-  my @vars = map {
-    +{
-      ref => $_->[0],
-      new => $_->[1],
-      old => _reref(ref($_->[0]), _deref($_->[0])),
-			copy => _copy($_->[0]),
-			deref => _reref(ref($_->[0]), _deref($_->[0])),
-    };
-  } @_;
+	return y_combinator {
+		my ($recurse) = @_;
+		return sub {
+			my $where = shift @where;
+			my $to_run = scalar @where ? $recurse : $code;
+			return run_then_restore(@$where, $to_run);
+		};
+	}->();
+}
 
-  return hook_run(
-    before => sub { _set_ref($_->{ref}, $_->{new}, $_) foreach @vars },
-    run    => $code,
-    after  => sub { _set_ref($_->{ref}, (ref($_->{ref}) eq 'HASH' ? $_->{copy} : $_->{old}), $_) foreach @vars },
-  );
+sub assert(&$) {
+	require Carp;
+	Carp::confess pop() if ! shift->();
+}
+
+sub run_then_restore {
+	my $code = pop;
+	my (@args) = @_;
+
+	assert { ! grep { ! ref($_) } lkeys @args } "error: you gave me a bare scalar - give me a scalar reference instead";
+
+	my @restore;
+
+	my %sg = (
+		SCALAR => [
+			sub {
+				my ($r, $v) = @_;
+				$$r = $v;
+			},
+			sub {
+				my ($r, $v) = @_;
+				return $$r;
+			},
+		],
+		HASH => [
+			sub {
+				my ($r, $v) = @_;
+				%$r = %$v;
+			},
+			sub {
+				my ($r, $v) = @_;
+				return +{%$r};
+			},
+		],
+	);
+
+	return hook_run(
+		before => sub {
+			while (my ($r, $v) = splice @args, 0, 2) {
+				my ($setter, $getter) = @{$sg{ref $r} || $sg{SCALAR}};
+				push @restore, {ref => $r, value => $getter->($r, $v)};
+				$setter->($r, $v);
+			}
+		},
+		run => $code,
+		after => sub {
+			foreach (@restore) {
+				my ($setter) = @{$sg{ref $_->{value}} || $sg{SCALAR}};
+				$setter->($_->{ref}, $_->{value});
+			}
+		},
+	);
 }
 
 1;

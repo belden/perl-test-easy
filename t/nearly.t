@@ -3,13 +3,14 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More tests => 3;
 
 use lib grep { -d } qw(./lib ../lib);
 use Test::Easy;
 
 subtest basic => sub {
 	diag "Answer the basic question of, 'Is this time within X seconds of this date?'";
+	plan tests => 3;
 
 	my $some_epoch = int rand(time);
 	my $some_localtime = localtime($some_epoch);
@@ -23,6 +24,7 @@ subtest basic => sub {
 
 subtest pluggable => sub {
 	diag 'Illustrate how to plug in support for other time formats';
+	plan tests => 1;
 
 	Test::Easy::Time->add_format(
 		_description => 'CCYYMMDDhhmmss',
@@ -43,6 +45,7 @@ subtest pluggable => sub {
 
 subtest deep_ok => sub {
   diag 'Show how time_nearly() plays with deep_ok()';
+	plan tests => 3;
 
 	my $some_epoch = int rand(time);
 	my $some_date  = localtime $some_epoch;
@@ -67,5 +70,28 @@ subtest deep_ok => sub {
 	deep_ok( [$now], [around_about($time, 0)], "'$now' is within 0 seconds of epoch time '$time'" );
 };
 
-# todo:
-# * some notion about error messaging
+__END__
+
+subtest tdd_useful => sub {
+	diag "We don't produce extra chatter into tests";
+	plan tests => 3;
+
+	my $time = time;
+	my $localtime = localtime($time);
+
+	my %got = (
+		no_matching_key => 1,
+		mismatched_value => 'got',
+		same_time => $localtime,
+	);
+
+	my %exp = (
+		# no_matching_key => 1,
+		mismatched_value => 'expected',
+		same_time => around_about($time, 0),
+	);
+
+	deep_ok( \%got, \%exp );
+	is( $got{same_time}, $localtime );
+	is( $exp{same_time}{raw}[0], $time );
+};

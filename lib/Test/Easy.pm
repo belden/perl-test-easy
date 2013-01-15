@@ -62,7 +62,15 @@ sub nearly {
 
 sub around_about {
 	my ($now, $epsilon) = @_;
+
+	$epsilon ||= 0;
+
 	return Test::Easy::utils::tester->new(
+		raw  => [$now, $epsilon],
+		explain => sub {
+			my ($got, $raw) = @_;
+			return sprintf '%s within %s seconds of %s', $got, reverse @$raw;
+		},
 		test => sub {
 			my ($got) = @_;
 			return time_nearly($got, $now, $epsilon);
@@ -83,6 +91,7 @@ sub deep_ok ($$;$) {
 
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::ok( deep_equal($got, $exp), $message ) || do {
+		$_ = clone_and_mutate_for_diag($_) foreach $got, $exp;
 		my $dump_got = Data::Denter::Denter($got);
 		my $dump_exp = Data::Denter::Denter($exp);
 
@@ -91,12 +100,15 @@ sub deep_ok ($$;$) {
     Test::More::diag '$EXPECTED';
     Test::More::diag $dump_exp;
 
-    my $diff = Text::Diff::diff(\$dump_got, \$dump_exp, {CONTEXT => 2**31});
+    my $diff = Text::Diff::diff(\$dump_exp, \$dump_got, {CONTEXT => 2**31});
     $diff =~ s/^\@\@.*\@\@\n//;
-    Test::More::diag "\n\nDIFF\n- \$GOT\n+ \$EXPECTED\n";
+    Test::More::diag "\n\nDIFF\n+ \$GOT\n- \$EXPECTED\n";
     Test::More::diag $diff;
   };
 }
+
+# lame placeholder
+sub clone_and_mutate_for_diag { shift }
 
 sub each_ok (&@) {
 	my $code = shift;

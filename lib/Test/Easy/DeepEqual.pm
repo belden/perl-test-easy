@@ -4,22 +4,21 @@ use base qw(Exporter);
 use strict;
 use warnings;
 
-use Scalar::Util qw(blessed);
+use Carp ();
+use Scalar::Util ();
 use Test::Easy::utils::tester;
 
 our @EXPORT_OK = qw(deep_equal);
 
-sub _cluck { require Carp; Carp::cluck(@_) }
-sub _confess { require Carp; Carp::confess(@_) }
-
 sub deep_equal {
-	_confess "must have only two things to deep_equal" if @_ != 2;
+	Carp::confess "must have only two things to deep_equal" if @_ != 2;
 
 	return 1 if _undefs(@_);
 	return 0 unless _same_type(@_);
 	return 1 if _hashrefs(@_) && _same_hashrefs(@_);
 	return 1 if _arrayrefs(@_) && _same_arrayrefs(@_);
 	return 1 if _same_values(@_); # note, not 'if _scalars(@_) && _same_values(@_)'
+	return 0;
 }
 
 sub _undefs    { return 2 == grep { ! defined } @_ }
@@ -33,7 +32,7 @@ sub _same_type {
 	return 1 if _undefs(@_);
 	return 1 if ref($got) eq ref($exp);
 	return 1 if ! ref($got) && _is_a_checker($exp);
-	_cluck "a ${\ref($got)} is not a ${\ref($exp)}!\n";
+	Carp::cluck "a ${\ref($got)} is not a ${\ref($exp)}!\n";
 	return 0;
 }
 
@@ -80,7 +79,7 @@ sub _same_arrayrefs {
 sub _is_a_checker {
 	my ($exp) = @_;
 	my $ref = ref($exp);
-	return $ref && blessed($exp) && UNIVERSAL::can($exp, 'check_value');
+	return $ref && Scalar::Util::blessed($exp) && UNIVERSAL::can($exp, 'check_value');
 }
 
 sub _same_values {
