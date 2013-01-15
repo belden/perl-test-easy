@@ -5,6 +5,7 @@ use strict;
 use warnings;
 
 require Test::Easy;
+use Test::Easy::utils::tester;
 
 our @EXPORT = qw(time_nearly);
 
@@ -23,10 +24,21 @@ sub time_nearly {
 	my ($low, $high) = ($expected - $epsilon, $expected + $epsilon);
 	my $guess;
 	local $_;
-	SAMPLE: foreach ($low .. $high) {
-		foreach my $formatter (@_formatters) {
-			if ($formatter->{format_epoch_seconds}->() eq $got) {
-				$guess = $_;
+
+	my @testers = map {
+		my $formatter = $_;
+		Test::Easy::utils::tester->new(
+			test => sub {
+				local $_ = shift;
+				return $formatter->{format_epoch_seconds}->() eq $got;
+			},
+		);
+	} @_formatters;
+
+  SAMPLE: foreach my $try ($low .. $high) {
+		foreach my $tester (@testers) {
+			if ($tester->check_value($try)) {
+				$guess = $try;
 				last SAMPLE;
 			}
 		}
