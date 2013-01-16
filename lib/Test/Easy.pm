@@ -21,7 +21,7 @@ use Test::Easy::DataDriven;
 our $VERSION = 1.04;
 
 ## spend a little time moving things around into @EXPORT, @EXPORT_OK
-our @EXPORT = qw(nearly_ok each_ok deep_ok around_about);
+our @EXPORT = qw(nearly_ok each_ok deep_ok around_about wiretap);
 our @EXPORT_OK = qw(nearly test_sub match);
 foreach my $supplier (qw(Test::Resub Test::Easy::DataDriven Test::Easy::Time Test::Easy::DeepEqual)) {
 	no strict 'refs';
@@ -158,6 +158,15 @@ sub _match {
 	} else {
 		confess "I don't know how to compare a '${\ref($got)}' to a '${\ref($expected)}'";
 	}
+}
+
+sub wiretap {
+	my ($target, $pre, @args) = @_;
+	my $rs;
+	$rs = resub $target, sub {
+		$pre->(@_) if $pre;
+		$rs->{orig_code}->(@_);
+	}, @args;
 }
 
 1;

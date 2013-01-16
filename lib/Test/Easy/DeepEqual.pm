@@ -46,7 +46,7 @@ sub _same_hashrefs {
 
 	# not 'each': it would reset the hash's iterator on a potentially weird caller
 	foreach my $k (keys %$exp) {
-		return 0 unless exists $exp->{$k};
+		return 0 unless exists $got->{$k};
 		return 0 unless deep_equal($got->{$k}, $exp->{$k});
 	}
 
