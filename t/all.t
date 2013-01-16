@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 21;
+use Test::More tests => 18;
 use lib grep { -d $_ } qw(./lib ../lib);
 use Test::Easy::DataDriven qw(run_where);
 
