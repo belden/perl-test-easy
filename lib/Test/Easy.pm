@@ -65,7 +65,7 @@ sub around_about {
 
 	$epsilon ||= 0;
 
-	return Test::Easy::utils::tester->new(
+	return Test::Easy::equivalence->new(
 		raw  => [$now, $epsilon],
 		explain => sub {
 			my ($got, $raw) = @_;

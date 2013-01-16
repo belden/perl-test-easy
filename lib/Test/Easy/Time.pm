@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 require Test::Easy;
-use Test::Easy::utils::tester;
+use Test::Easy::equivalence;
 
 our @EXPORT = qw(time_nearly);
 
@@ -27,7 +27,7 @@ sub time_nearly {
 
 	my @testers = map {
 		my $formatter = $_;
-		Test::Easy::utils::tester->new(
+		Test::Easy::equivalence->new(
 			test => sub {
 				local $_ = shift;
 				return $formatter->{format_epoch_seconds}->() eq $got;

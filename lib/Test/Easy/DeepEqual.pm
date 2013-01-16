@@ -6,7 +6,7 @@ use warnings;
 
 use Carp ();
 use Scalar::Util ();
-use Test::Easy::utils::tester;
+use Test::Easy::equivalence;
 
 our @EXPORT = qw(deep_equal);
 
@@ -77,7 +77,7 @@ sub _same_values {
 	my ($ref_got, $ref_exp) = map { ref } $got, $exp;
 	my $checker = _is_a_checker($exp)
 		? $exp
-		: Test::Easy::utils::tester->new(
+		: Test::Easy::equivalence->new(
 			test => sub {
 				my ($got) = @_;
 				return "$got" eq "$exp";

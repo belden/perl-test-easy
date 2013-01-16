@@ -1,4 +1,4 @@
-package Test::Easy::utils::tester;
+package Test::Easy::equivalence;
 use strict;
 use warnings;
 
