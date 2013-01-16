@@ -91,17 +91,3 @@ use Test::Easy::DataDriven qw(run_where);
 	($out) = run_where($context_sensitive);
 	is( $out, 'array', 'detected array context properly' );
 }
-
-# hash
-{
-	my %hash = (1..10);
-	is_deeply( \%hash, {1..10}, 'sanity' );
-
-	run_where(
-		[\%hash => {'a'..'f'}],
-		sub {
-			is_deeply( \%hash, {'a'..'f'}, 'local' );
-		}
-	 );
-	is_deeply( \%hash, {1..10}, 'restore' );
-}
