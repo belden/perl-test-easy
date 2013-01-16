@@ -9,18 +9,10 @@ use Scalar::Util qw(blessed);
 use Hash::MostUtils qw(lkeys);
 use Functional::Utility qw(hook_run);
 
-our @EXPORT_OK = qw(run_where);
+our @EXPORT = qw(run_where);
 
-sub y_combinator (&) {
-	my $curried = shift;
-	return sub {
-		my $f1 = shift;
-		return $curried->(sub { $f1->($f1)(@_) })
-	}->(sub {
-		my $f2 = shift;
-		return $curried->(sub { $f2->($f2)(@_) });
-	});
-}
+sub y_combinator (&);
+sub assert (&;$);
 
 sub run_where {
 	my $code = pop;
@@ -36,9 +28,15 @@ sub run_where {
 	}->();
 }
 
-sub assert(&$) {
-	require Carp;
-	Carp::confess pop() if ! shift->();
+sub y_combinator (&) {
+	my $curried = shift;
+	return sub {
+		my $f1 = shift;
+		return $curried->(sub { $f1->($f1)(@_) })
+	}->(sub {
+		my $f2 = shift;
+		return $curried->(sub { $f2->($f2)(@_) });
+	});
 }
 
 sub run_then_restore {
@@ -88,6 +86,11 @@ sub run_then_restore {
 			}
 		},
 	);
+}
+
+sub assert(&;$) {
+	require Carp;
+	Carp::confess pop() if ! shift->();
 }
 
 1;

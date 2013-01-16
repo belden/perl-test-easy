@@ -15,8 +15,8 @@ use Text::Diff ();
 # this module re-exports functions from these modules
 use Test::Resub;
 use Test::Easy::Time;
+use Test::Easy::DeepEqual;
 use Test::Easy::DataDriven;
-use Test::Easy::DeepEqual qw(deep_equal);
 
 our $VERSION = 1.04;
 

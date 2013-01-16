@@ -8,7 +8,7 @@ use Carp ();
 use Scalar::Util ();
 use Test::Easy::utils::tester;
 
-our @EXPORT_OK = qw(deep_equal);
+our @EXPORT = qw(deep_equal);
 
 sub deep_equal {
 	Carp::confess "must have only two things to deep_equal" if @_ != 2;
