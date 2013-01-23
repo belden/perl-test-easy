@@ -69,29 +69,3 @@ subtest deep_ok => sub {
 	my $time = time;
 	deep_ok( [$now], [around_about($time, 0)], "'$now' is within 0 seconds of epoch time '$time'" );
 };
-
-__END__
-
-subtest tdd_useful => sub {
-	diag "We don't produce extra chatter into tests";
-	plan tests => 3;
-
-	my $time = time;
-	my $localtime = localtime($time);
-
-	my %got = (
-		no_matching_key => 1,
-		mismatched_value => 'got',
-		same_time => $localtime,
-	);
-
-	my %exp = (
-		# no_matching_key => 1,
-		mismatched_value => 'expected',
-		same_time => around_about($time, 0),
-	);
-
-	deep_ok( \%got, \%exp );
-	is( $got{same_time}, $localtime );
-	is( $exp{same_time}{raw}[0], $time );
-};
