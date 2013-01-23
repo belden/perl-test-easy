@@ -18,7 +18,7 @@ use Test::Easy::Time;
 use Test::Easy::DeepEqual;
 use Test::Easy::DataDriven;
 
-our $VERSION = 1.04;
+our $VERSION = 1.01;
 
 ## spend a little time moving things around into @EXPORT, @EXPORT_OK
 our @EXPORT = qw(nearly_ok each_ok deep_ok around_about wiretap);
