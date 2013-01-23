@@ -11,6 +11,7 @@ WriteMakefile(
 	PREREQ_PM => {
 		# you should have these
 		'Test::More' => 0,
+		'Scalar::Util' => 0,
 
 		# I need to release these too, I suppose
 		'Functional::Utility' => 0,
@@ -19,15 +20,13 @@ WriteMakefile(
 		# for deep_equal and deep_ok
 		'Data::Denter' => 0,
 		'Text::Diff' => 0,
-
-		# core as of a long time ago
-		'Scalar::Util' => 0,
 	},
 	META_MERGE => {
 		resources => {
 			bugtracker => 'https://github.com/belden/perl-test-easy/issues',
 		},
 	},
+	LICENSE => 'perl',
 	dist => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean => { FILES => 'Test-Easy-*' },
 );
