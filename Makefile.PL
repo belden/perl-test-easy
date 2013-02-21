@@ -12,7 +12,7 @@ WriteMakefile(
 		# you should have these
 		'Test::More' => 0,
 
-		# I need to release these too, I suppose
+    'Test::Resub' => 0,
 		'Functional::Utility' => 0,
 		'Hash::MostUtils' => 0,
 
