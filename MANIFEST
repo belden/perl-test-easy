@@ -9,3 +9,7 @@ lib/Test/Easy/DataDriven.pm
 lib/Test/Easy.pm
 Makefile.PL
 LICENSE
+lib/Test/Easy/DeepEqual.pm
+lib/Test/Easy/equivalence.pm
+lib/Test/Easy/Time.pm
+t/nearly.t
