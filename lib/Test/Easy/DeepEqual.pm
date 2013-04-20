@@ -1,14 +1,34 @@
+use strict;
+use warnings;
 package Test::Easy::DeepEqual;
 use base qw(Exporter);
 
-use strict;
-use warnings;
-
 use Carp ();
+use Data::Denter ();
+use Data::Denter ();
+use Data::Difflet;
 use Scalar::Util ();
 use Test::Easy::equivalence;
+use Test::More ();
 
-our @EXPORT = qw(deep_equal);
+our @EXPORT = qw(deep_ok deep_equal);
+
+sub deep_ok ($$;$) {
+  my ($got, $exp, $message) = @_;
+
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+  Test::More::ok( deep_equal($got, $exp), $message ) || do {
+		my $dump_got = Data::Denter::Denter($got);
+		my $dump_exp = Data::Denter::Denter($exp);
+
+    Test::More::diag '$GOT';
+    Test::More::diag $dump_got;
+    Test::More::diag '$EXPECTED';
+    Test::More::diag $dump_exp;
+		Test::More::diag '$DIFFLET';
+		Test::More::diag(Data::Difflet->new->compare($got, $exp));
+  };
+}
 
 sub deep_equal {
 	Carp::confess "must have only two things to deep_equal" if @_ != 2;
@@ -18,6 +38,7 @@ sub deep_equal {
 	return 1 if _hashrefs(@_) && _same_hashrefs(@_);
 	return 1 if _arrayrefs(@_) && _same_arrayrefs(@_);
 	return 1 if _same_values(@_); # note, not 'if _scalars(@_) && _same_values(@_)'
+	return 1 if _regex_match(@_);
 	return 0;
 }
 
@@ -32,6 +53,10 @@ sub _same_type {
 	return 1 if _undefs(@_);
 	return 1 if ref($got) eq ref($exp);
 	return 1 if ! ref($got) && _is_a_checker($exp);
+	if (! ref($got) && ref($exp) eq 'Regexp') {
+$DB::single = 1;1;
+    return 1;
+  }
 	Carp::cluck "a ${\ref($got)} is not a ${\ref($exp)}!\n";
 	return 0;
 }
@@ -84,6 +109,12 @@ sub _same_values {
 			},
 	  );
 	return $checker->check_value($got);
+}
+
+sub _regex_match {
+	my ($got, $exp) = @_;
+	return 0 if ref($got) || ref($exp) ne 'Regexp';
+	return $got =~ $exp;
 }
 
 1;

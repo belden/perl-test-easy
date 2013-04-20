@@ -5,14 +5,17 @@ use strict;
 use warnings;
 
 use Carp qw(confess);
+use Test::Easy::DeepEqual qw(deep_equal);
 use Scalar::Util qw(blessed);
 use Hash::MostUtils qw(lkeys);
-use Functional::Utility qw(hook_run);
+use Functional::Utility qw(hook_run y_combinator);
 
-our @EXPORT = qw(run_where);
+our @EXPORT = qw(run_where each_ok);
 
-sub y_combinator (&);
-sub assert (&;$);
+sub assert(&;$) {
+	require Carp;
+	Carp::confess pop() if ! shift->();
+}
 
 sub run_where {
 	my $code = pop;
@@ -26,17 +29,6 @@ sub run_where {
 			return run_then_restore(@$where, $to_run);
 		};
 	}->();
-}
-
-sub y_combinator (&) {
-	my $curried = shift;
-	return sub {
-		my $f1 = shift;
-		return $curried->(sub { $f1->($f1)(@_) })
-	}->(sub {
-		my $f2 = shift;
-		return $curried->(sub { $f2->($f2)(@_) });
-	});
 }
 
 sub run_then_restore {
@@ -88,9 +80,54 @@ sub run_then_restore {
 	);
 }
 
-sub assert(&;$) {
-	require Carp;
-	Carp::confess pop() if ! shift->();
+sub each_ok (&@) {
+	my $code = shift;
+
+	local $_;
+
+	my $index = 0;
+
+	my @bad;
+	foreach (@_) {
+		my $orig = $_;
+		my (@got) = $code->();
+
+		my $ok = 1;
+		my $expected;
+
+		if (@got == 1) {
+			$ok = !! $got[0];
+			$expected = 'something true';
+		} elsif (! _match($got[0], $got[1])) {
+			$ok = 0;
+			$expected = $got[1];
+		}
+
+		push @bad, {
+			raw => $_,
+			index => $index,
+			got => $got[0],
+			expected => $expected,
+		} if ! $ok;
+
+		$index++;
+	}
+
+	local $Test::Builder::Level = $Test::Builder::Level + 1;
+	return Test::Easy::deep_ok( \@bad, [] );
+}
+
+sub _match {
+	my ($got, $expected) = @_;
+	if (ref($expected) eq 'Regexp') {
+		return $got =~ $expected;
+	} elsif (! scalar grep { ref } ($got, $expected)) {
+		return $got eq $expected;
+	} elsif (ref($got) eq ref($expected)) {
+		return deep_equal($got, $expected);
+	} else {
+		confess "I don't know how to compare a '${\ref($got)}' to a '${\ref($expected)}'";
+	}
 }
 
 1;
