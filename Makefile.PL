@@ -9,12 +9,13 @@ WriteMakefile(
 	ABSTRACT_FROM  => 'lib/Test/Easy.pm',
 	PL_FILES => {},
 	PREREQ_PM => {
-		'Data::Denter'        => 0,       # for deep_equal and deep_ok
-		'Data::Difflet'       => 0.06,    # for deep_equal and deep_ok
-		'Functional::Utility' => 1.02,
-		'Hash::MostUtils'     => 1.05,
-		'Scalar::Util'        => 0,
-		'Test::More'          => 0,
+ 		'Data::Denter'        => 0,       # for deep_equal and deep_ok
+ 		'Data::Difflet'       => 0.06,    # for deep_equal and deep_ok
+ 		'Functional::Utility' => 1.02,
+ 		'Hash::MostUtils'     => 1.05,
+ 		'Scalar::Util'        => 0,
+ 		'Test::More'          => 0,
+ 		'Test::Resub'         => 0,
 	},
 	META_MERGE => {
 		resources => {

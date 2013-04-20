@@ -12,5 +12,4 @@ LICENSE
 lib/Test/Easy/DeepEqual.pm
 lib/Test/Easy/equivalence.pm
 lib/Test/Easy/Time.pm
-lib/Test/Easy/util/TestMore.pm
 t/nearly.t

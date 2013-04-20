@@ -15,7 +15,7 @@ use Test::Easy::DeepEqual;
 use Test::Easy::Time;
 use Test::Resub;
 
-our $VERSION = 1.01;
+our $VERSION = 1.05;
 
 ## spend a little time moving things around into @EXPORT, @EXPORT_OK
 our @EXPORT = qw(nearly_ok around_about wiretap);
