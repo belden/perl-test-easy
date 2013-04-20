@@ -226,7 +226,7 @@ you deal onto your future self. My primary goals in writing this library for mys
 
 =item * L</"Receive Highly Informative Test Failures">: C<deep_ok>, C<each_ok>
 
-=item * L</"Minimize Manual State Tracking and Resetting": C<run_where>
+=item * L</"Minimize Manual State Tracking and Resetting">: C<run_where>
 
 =item * L</"Recognize Missing Test Coverage">: C<run_where>
 
