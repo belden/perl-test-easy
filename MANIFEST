@@ -13,3 +13,4 @@ lib/Test/Easy/DeepEqual.pm
 lib/Test/Easy/equivalence.pm
 lib/Test/Easy/Time.pm
 t/nearly.t
+eg/pod.pl
