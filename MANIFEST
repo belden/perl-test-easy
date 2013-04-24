@@ -1,5 +1,5 @@
 MANIFEST
-README.md
+README.pod
 t/basic.t
 t/all.t
 t/hash.t
