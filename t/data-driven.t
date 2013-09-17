@@ -19,7 +19,7 @@ use Test::Easy::DataDriven qw(run_where);
 	run_where(
 		[\$foo => 'foo'],
 		[\$bar => sub { 'bar' }],
-		[\$baz => [8,9]],
+		[$baz => [8,9]],
 		sub {
 			is( $foo, 'foo', '$foo has temp value' );
 			is( $bar->(), 'bar', '$bar has temp value' );

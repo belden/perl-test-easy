@@ -50,6 +50,16 @@ sub run_then_restore {
 				return $$r;
 			},
 		],
+		ARRAY => [
+			sub {
+				my ($r, $v) = @_;
+				@$r = @$v;
+			},
+			sub {
+				my ($r, $v) = @_;
+				return [@$r];
+			},
+		],
 		HASH => [
 			sub {
 				my ($r, $v) = @_;
