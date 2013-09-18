@@ -1,8 +1,8 @@
-*~
-Makefile
-lib/Test/Easy/util/
+.rock.yml
 local/
-blib/
+Makefile
 pm_to_blib
+.git
+blib/
 MYMETA.json
 MYMETA.yml

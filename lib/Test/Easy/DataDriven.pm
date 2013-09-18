@@ -50,9 +50,21 @@ sub run_then_restore {
 				return $$r;
 			},
 		],
+		ARRAY => [
+			sub {
+				my ($r, $v) = @_;
+        $r = $$r if ref($r) eq 'REF';
+				@$r = @$v;
+			},
+			sub {
+				my ($r, $v) = @_;
+				return [@$r];
+			},
+		],
 		HASH => [
 			sub {
 				my ($r, $v) = @_;
+        $r = $$r if ref($r) eq 'REF';
 				%$r = %$v;
 			},
 			sub {
