@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More tests => 17;
 use Test::Easy::DataDriven qw(run_where);
 
 {
@@ -43,4 +43,24 @@ use Test::Easy::DataDriven qw(run_where);
 
 	($out) = run_where($context_sensitive);
 	is( $out, 'array', 'detected array context properly' );
+}
+
+# if you pass in a reference to a reference, run_where does the right thing
+{
+	my ($hash_ref, $array_ref, $scalar, $scalar_ref) = ({'a'..'f'}, [1..10], 'hello', \'world');
+	run_where(
+		[\$scalar => 'goodnight'],
+		[\$scalar_ref => \'moon'],
+		[\$hash_ref => {'A'..'F'}],
+		[\$array_ref => [11..20]],
+		sub {
+      is( "$scalar $$scalar_ref", 'goodnight moon' );
+      is_deeply( $hash_ref, +{qw(A B C D E F)} );
+      is_deeply( $array_ref, [11..20] );
+		}
+	);
+
+  is( "$scalar $$scalar_ref", 'hello world' );
+  is_deeply( $hash_ref, +{qw(a b c d e f)} );
+  is_deeply( $array_ref, [1..10] );
 }

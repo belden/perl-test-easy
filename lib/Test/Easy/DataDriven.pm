@@ -53,6 +53,7 @@ sub run_then_restore {
 		ARRAY => [
 			sub {
 				my ($r, $v) = @_;
+        $r = $$r if ref($r) eq 'REF';
 				@$r = @$v;
 			},
 			sub {
@@ -63,6 +64,7 @@ sub run_then_restore {
 		HASH => [
 			sub {
 				my ($r, $v) = @_;
+        $r = $$r if ref($r) eq 'REF';
 				%$r = %$v;
 			},
 			sub {
