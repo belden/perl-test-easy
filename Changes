@@ -1,0 +1,8 @@
+---
+version: 1.06
+date:    2013-09-18
+changes:
+- run_where() handles left-hand-side of statelets being a reference to your intended target
+- run_where() handles array references as first-order data types
+- doc updates to reflect above
+

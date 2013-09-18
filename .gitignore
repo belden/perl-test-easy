@@ -2,3 +2,7 @@
 Makefile
 lib/Test/Easy/util/
 local/
+blib/
+pm_to_blib
+MYMETA.json
+MYMETA.yml

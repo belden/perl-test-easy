@@ -1,5 +1,4 @@
 MANIFEST
-README.md
 t/basic.t
 t/all.t
 t/hash.t
@@ -14,3 +13,6 @@ lib/Test/Easy/equivalence.pm
 lib/Test/Easy/Time.pm
 t/nearly.t
 eg/pod.pl
+Changes
+MANIFEST.SKIP
+README.pod
