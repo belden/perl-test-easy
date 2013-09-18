@@ -319,9 +319,9 @@ examples:
     my $coderef       = sub { 'hi' };
 
     run_where(
-        [$coderef => sub { 'bye' }],
-        [$hashref => {apple => 'banana'}],
-        [$arrayref => [qw(hi mom)]],
+        [\$coderef => sub { 'bye' }],
+        [\$hashref => {apple => 'banana'}],
+        [\$arrayref => [qw(hi mom)]],
         [\$just_a_scalar => 8843],
         sub {
             $coderef->() . join ',', %$hashref, @$arrayref, $just_a_scalar,
