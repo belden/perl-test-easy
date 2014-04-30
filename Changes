@@ -1,4 +1,10 @@
 ---
+version: 1.08
+date:    2014-04-30
+changes:
+- bug fix - fixed the failing nearly.t 
+- doc tweaks
+---
 version: 1.07
 date:    2013-09-18
 changes:
