@@ -1,4 +1,9 @@
 ---
+version: 1.09
+date:    2014-05-01
+changes:
+- bug fix - setting a proper TZ when handling hardcoded epochtimes in tests
+---
 version: 1.08
 date:    2014-04-30
 changes:
