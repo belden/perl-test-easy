@@ -46,6 +46,7 @@ sub pretty_epoch {
 		},
 	);
 
+	local $ENV{TZ} = 'America/Los_Angeles';
 	my $random_midnight = 895729680;        # Wed May 20 22:48:00 1998 - it's a keyrattle date
 	my $weird_date = '1998-05-20-22-48-03'; # Wed May 20 22:48:03 1998 - deliberately within 5s of above
 	ok( time_nearly($weird_date, $random_midnight, 5), "${\pretty_epoch $random_midnight} is within 5 seconds of $weird_date"	);
