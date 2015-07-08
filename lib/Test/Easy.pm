@@ -15,7 +15,7 @@ use Test::Easy::DeepEqual;
 use Test::Easy::Time;
 use Test::Resub;
 
-our $VERSION = 1.09;
+our $VERSION = 1.10;
 
 ## spend a little time moving things around into @EXPORT, @EXPORT_OK
 our @EXPORT = qw(nearly_ok around_about wiretap);
@@ -92,10 +92,10 @@ sub test_sub (&) {
 
 sub wiretap {
   my ($target, $pre, @args) = @_;
-  my $rs;
-  $rs = resub $target, sub {
+  my $orig = do { no strict 'refs'; *{$target}{CODE} };
+  return resub $target, sub {
     $pre->(@_) if $pre;
-    $rs->{orig_code}->(@_);
+    $orig->(@_);
   }, @args;
 }
 
