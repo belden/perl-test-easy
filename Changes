@@ -1,4 +1,9 @@
 ---
+version: 1.10
+date:    2015-07-08
+changes:
+- bug fix - wiretap objects now clean up when they exit scope
+---
 version: 1.09
 date:    2014-05-01
 changes:

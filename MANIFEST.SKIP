@@ -7,3 +7,4 @@ blib/
 MYMETA.json
 MYMETA.yml
 prove.perl*
+eg/pod.pl
