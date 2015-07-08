@@ -21,32 +21,32 @@ our $VERSION = 1.09;
 our @EXPORT = qw(nearly_ok around_about wiretap);
 our @EXPORT_OK = qw(nearly test_sub);
 foreach my $supplier (qw(
-	Test::Resub
-	Test::Easy::DataDriven
-	Test::Easy::Time
-	Test::Easy::DeepEqual
+  Test::Resub
+  Test::Easy::DataDriven
+  Test::Easy::Time
+  Test::Easy::DeepEqual
 )) {
-	no strict 'refs';
-	push @EXPORT, @{"$supplier\::EXPORT"};
-	push @EXPORT_OK, @{"$supplier\::EXPORT_TAGS"};
+  no strict 'refs';
+  push @EXPORT, @{"$supplier\::EXPORT"};
+  push @EXPORT_OK, @{"$supplier\::EXPORT_TAGS"};
 }
 
 # Set up %EXPORT_TAGS based on whatever we've shoved into @EXPORT, @EXPORT_OK
 our %EXPORT_TAGS = (
-	helpers => [@EXPORT_OK],
-	all => [@EXPORT, @EXPORT_OK],
+  helpers => [@EXPORT_OK],
+  all => [@EXPORT, @EXPORT_OK],
 );
 foreach my $supplier (qw(Test::Resub Test::Easy::DataDriven)) {
-	no strict 'refs';
-	%EXPORT_TAGS = _merge(%EXPORT_TAGS, %{"$supplier\::EXPORT_TAGS"});
+  no strict 'refs';
+  %EXPORT_TAGS = _merge(%EXPORT_TAGS, %{"$supplier\::EXPORT_TAGS"});
 }
 
 sub _merge {
-	my %out;
-	while (my ($k, $v) = splice @_, 0, 2) {
-		push @{$out{$k}}, @$v;
-	}
-	return %out;
+  my %out;
+  while (my ($k, $v) = splice @_, 0, 2) {
+    push @{$out{$k}}, @$v;
+  }
+  return %out;
 }
 
 # code begins here
@@ -55,31 +55,31 @@ sub nearly_ok {
   my ($got, $expected, $epsilon, $message) = @_;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::ok( nearly($got, $expected, $epsilon), $message )
-		 or warn "expected $got to be $expected +/- $epsilon; actual difference was " . ($expected - $got) . "\n";
+     or warn "expected $got to be $expected +/- $epsilon; actual difference was " . ($expected - $got) . "\n";
 }
 
 sub nearly {
-	my ($got, $expected, $epsilon) = @_;
+  my ($got, $expected, $epsilon) = @_;
   my $close = abs($expected - $got) <= $epsilon;
-	return !!$close;
+  return !!$close;
 }
 
 sub around_about {
-	my ($now, $epsilon) = @_;
+  my ($now, $epsilon) = @_;
 
-	$epsilon ||= 0;
+  $epsilon ||= 0;
 
-	return Test::Easy::equivalence->new(
-		raw  => [$now, $epsilon],
-		explain => sub {
-			my ($got, $raw) = @_;
-			return sprintf '%s within %s seconds of %s', $got, reverse @$raw;
-		},
-		test => sub {
-			my ($got) = @_;
-			return time_nearly($got, $now, $epsilon);
-		},
-	);
+  return Test::Easy::equivalence->new(
+    raw  => [$now, $epsilon],
+    explain => sub {
+      my ($got, $raw) = @_;
+      return sprintf '%s within %s seconds of %s', $got, reverse @$raw;
+    },
+    test => sub {
+      my ($got) = @_;
+      return time_nearly($got, $now, $epsilon);
+    },
+  );
 }
 
 sub test_sub (&) {
@@ -91,12 +91,12 @@ sub test_sub (&) {
 }
 
 sub wiretap {
-	my ($target, $pre, @args) = @_;
-	my $rs;
-	$rs = resub $target, sub {
-		$pre->(@_) if $pre;
-		$rs->{orig_code}->(@_);
-	}, @args;
+  my ($target, $pre, @args) = @_;
+  my $rs;
+  $rs = resub $target, sub {
+    $pre->(@_) if $pre;
+    $rs->{orig_code}->(@_);
+  }, @args;
 }
 
 1;
@@ -499,10 +499,10 @@ Consequently, instead of seeing this type of failure for this test:
     is_deeply( [1, 2, 3], [4, 5, 3], 'lists are the same' );
 
     __END__
-		#   Failed test 'lists are the same'
-		#     Structures begin differing at:
-		#          $got->[0] = '1'
-		#     $expected->[0] = '4'
+    #   Failed test 'lists are the same'
+    #     Structures begin differing at:
+    #          $got->[0] = '1'
+    #     $expected->[0] = '4'
 
 You can instead see this failure:
 
@@ -632,44 +632,44 @@ There's no reason these all need to be expressed as individual tests. You can se
 holds each of the precondition clauses for the run_where()s, and which holds the expected output, and then
 use C<run_where()> inside an C<each_ok> to reduce all of the above to a more compact form still:
 
-     1	    my ($foo, $bar) = (undef, {});
+     1      my ($foo, $bar) = (undef, {});
      2
-     3	    each_ok {
-     4	        run_where(
-     5	          @{$_->{preconditions}},
-     6	          sub { some_code($foo, $bar), $_->{expected_output} }
-     7	        );
-     8	    } ({
-     9	        preconditions => [
-    10	            [\$foo => 1],
-    11	            [$bar => {hello => 'world'}],
-    12	        ],
-    13	        expected_output => "hello, world",
-    14	    }, {
-    15	        preconditions => [
-    16	            [\$foo => 2],
-    17	            [$bar => {hello => 'world'}],
-    18	        ],
-    19	        expected_output => "hello, world\nhello, world",
-    20	    }, {
-    21	        preconditions => [
-    22	            [\$foo => 2],
-    23	            [$bar => {}],
-    24	        ],
-    25	        expected_output => '',
-    26	    }, {
-    27	        preconditions => [
-    28	            [\$foo => 0],
-    29	            [$bar => {goodnight => 'moon'}],
-    30	        ],
-    31	        expected_output => 'something surprising',
-    32	    }, {
-    33	        preconditions => [
-    34	            [\$foo => undef],
-    35	            [$bar => {}],
-    36	        ],
-    37	        expected_output => undef,
-    38	    });
+     3      each_ok {
+     4          run_where(
+     5            @{$_->{preconditions}},
+     6            sub { some_code($foo, $bar), $_->{expected_output} }
+     7          );
+     8      } ({
+     9          preconditions => [
+    10              [\$foo => 1],
+    11              [$bar => {hello => 'world'}],
+    12          ],
+    13          expected_output => "hello, world",
+    14      }, {
+    15          preconditions => [
+    16              [\$foo => 2],
+    17              [$bar => {hello => 'world'}],
+    18          ],
+    19          expected_output => "hello, world\nhello, world",
+    20      }, {
+    21          preconditions => [
+    22              [\$foo => 2],
+    23              [$bar => {}],
+    24          ],
+    25          expected_output => '',
+    26      }, {
+    27          preconditions => [
+    28              [\$foo => 0],
+    29              [$bar => {goodnight => 'moon'}],
+    30          ],
+    31          expected_output => 'something surprising',
+    32      }, {
+    33          preconditions => [
+    34              [\$foo => undef],
+    35              [$bar => {}],
+    36          ],
+    37          expected_output => undef,
+    38      });
 
 Let's break that down a bit:
 
@@ -698,11 +698,11 @@ then scan the data to make sure nothing looks missing).
 
 Looking at the data structure above, you might notice that this condition is not tested:
 
-	        preconditions => [
-	            [\$foo => undef],
-	            [$bar => {fly_me => 'to the moon'}],
-	        ],
-	        expected_output => ..., # well, what should we expect here? 'something surprising'? undef? croak?
+          preconditions => [
+              [\$foo => undef],
+              [$bar => {fly_me => 'to the moon'}],
+          ],
+          expected_output => ..., # well, what should we expect here? 'something surprising'? undef? croak?
 
 It's very rare that I've rewritten some large state-tracking test to use C<each_ok { run_where ... } ...>
 and B<not> discovered some unreached combination of state variables. Once you see what you've missed

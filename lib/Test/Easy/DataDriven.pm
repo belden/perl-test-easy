@@ -13,133 +13,133 @@ use Functional::Utility qw(hook_run y_combinator);
 our @EXPORT = qw(run_where each_ok);
 
 sub assert(&;$) {
-	require Carp;
-	Carp::confess pop() if ! shift->();
+  require Carp;
+  Carp::confess pop() if ! shift->();
 }
 
 sub run_where {
-	my $code = pop;
-	my (@where) = @_;
+  my $code = pop;
+  my (@where) = @_;
 
-	return y_combinator {
-		my ($recurse) = @_;
-		return sub {
-			my $where = shift @where;
-			my $to_run = scalar @where ? $recurse : $code;
-			return run_then_restore(@$where, $to_run);
-		};
-	}->();
+  return y_combinator {
+    my ($recurse) = @_;
+    return sub {
+      my $where = shift @where;
+      my $to_run = scalar @where ? $recurse : $code;
+      return run_then_restore(@$where, $to_run);
+    };
+  }->();
 }
 
 sub run_then_restore {
-	my $code = pop;
-	my (@args) = @_;
+  my $code = pop;
+  my (@args) = @_;
 
-	assert { ! grep { ! ref($_) } lkeys @args } "error: you gave me a bare scalar - give me a scalar reference instead";
+  assert { ! grep { ! ref($_) } lkeys @args } "error: you gave me a bare scalar - give me a scalar reference instead";
 
-	my @restore;
+  my @restore;
 
-	my %sg = (
-		SCALAR => [
-			sub {
-				my ($r, $v) = @_;
-				$$r = $v;
-			},
-			sub {
-				my ($r, $v) = @_;
-				return $$r;
-			},
-		],
-		ARRAY => [
-			sub {
-				my ($r, $v) = @_;
+  my %sg = (
+    SCALAR => [
+      sub {
+        my ($r, $v) = @_;
+        $$r = $v;
+      },
+      sub {
+        my ($r, $v) = @_;
+        return $$r;
+      },
+    ],
+    ARRAY => [
+      sub {
+        my ($r, $v) = @_;
         $r = $$r if ref($r) eq 'REF';
-				@$r = @$v;
-			},
-			sub {
-				my ($r, $v) = @_;
-				return [@$r];
-			},
-		],
-		HASH => [
-			sub {
-				my ($r, $v) = @_;
+        @$r = @$v;
+      },
+      sub {
+        my ($r, $v) = @_;
+        return [@$r];
+      },
+    ],
+    HASH => [
+      sub {
+        my ($r, $v) = @_;
         $r = $$r if ref($r) eq 'REF';
-				%$r = %$v;
-			},
-			sub {
-				my ($r, $v) = @_;
-				return +{%$r};
-			},
-		],
-	);
+        %$r = %$v;
+      },
+      sub {
+        my ($r, $v) = @_;
+        return +{%$r};
+      },
+    ],
+  );
 
-	return hook_run(
-		before => sub {
-			while (my ($r, $v) = splice @args, 0, 2) {
-				my ($setter, $getter) = @{$sg{ref $r} || $sg{SCALAR}};
-				push @restore, {ref => $r, value => $getter->($r, $v)};
-				$setter->($r, $v);
-			}
-		},
-		run => $code,
-		after => sub {
-			foreach (@restore) {
-				my ($setter) = @{$sg{ref $_->{value}} || $sg{SCALAR}};
-				$setter->($_->{ref}, $_->{value});
-			}
-		},
-	);
+  return hook_run(
+    before => sub {
+      while (my ($r, $v) = splice @args, 0, 2) {
+        my ($setter, $getter) = @{$sg{ref $r} || $sg{SCALAR}};
+        push @restore, {ref => $r, value => $getter->($r, $v)};
+        $setter->($r, $v);
+      }
+    },
+    run => $code,
+    after => sub {
+      foreach (@restore) {
+        my ($setter) = @{$sg{ref $_->{value}} || $sg{SCALAR}};
+        $setter->($_->{ref}, $_->{value});
+      }
+    },
+  );
 }
 
 sub each_ok (&@) {
-	my $code = shift;
+  my $code = shift;
 
-	local $_;
+  local $_;
 
-	my $index = 0;
+  my $index = 0;
 
-	my @bad;
-	foreach (@_) {
-		my $orig = $_;
-		my (@got) = $code->();
+  my @bad;
+  foreach (@_) {
+    my $orig = $_;
+    my (@got) = $code->();
 
-		my $ok = 1;
-		my $expected;
+    my $ok = 1;
+    my $expected;
 
-		if (@got == 1) {
-			$ok = !! $got[0];
-			$expected = 'something true';
-		} elsif (! _match($got[0], $got[1])) {
-			$ok = 0;
-			$expected = $got[1];
-		}
+    if (@got == 1) {
+      $ok = !! $got[0];
+      $expected = 'something true';
+    } elsif (! _match($got[0], $got[1])) {
+      $ok = 0;
+      $expected = $got[1];
+    }
 
-		push @bad, {
-			raw => $_,
-			index => $index,
-			got => $got[0],
-			expected => $expected,
-		} if ! $ok;
+    push @bad, {
+      raw => $_,
+      index => $index,
+      got => $got[0],
+      expected => $expected,
+    } if ! $ok;
 
-		$index++;
-	}
+    $index++;
+  }
 
-	local $Test::Builder::Level = $Test::Builder::Level + 1;
-	return Test::Easy::deep_ok( \@bad, [] );
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+  return Test::Easy::deep_ok( \@bad, [] );
 }
 
 sub _match {
-	my ($got, $expected) = @_;
-	if (ref($expected) eq 'Regexp') {
-		return $got =~ $expected;
-	} elsif (! scalar grep { ref } ($got, $expected)) {
-		return $got eq $expected;
-	} elsif (ref($got) eq ref($expected)) {
-		return deep_equal($got, $expected);
-	} else {
-		confess "I don't know how to compare a '${\ref($got)}' to a '${\ref($expected)}'";
-	}
+  my ($got, $expected) = @_;
+  if (ref($expected) eq 'Regexp') {
+    return $got =~ $expected;
+  } elsif (! scalar grep { ref } ($got, $expected)) {
+    return $got eq $expected;
+  } elsif (ref($got) eq ref($expected)) {
+    return deep_equal($got, $expected);
+  } else {
+    confess "I don't know how to compare a '${\ref($got)}' to a '${\ref($expected)}'";
+  }
 }
 
 1;
