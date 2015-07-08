@@ -1,4 +1,9 @@
 ---
+version: 1.11
+date:    2015-07-08
+changes:
+- Add back Makefile.PL to MANIFEST, durr
+---
 version: 1.10
 date:    2015-07-08
 changes:

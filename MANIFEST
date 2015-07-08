@@ -1,3 +1,4 @@
+Makefile.PL
 Changes
 lib/Test/Easy.pm
 lib/Test/Easy/DataDriven.pm
