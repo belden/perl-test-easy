@@ -1,4 +1,9 @@
 ---
+version: 1.12
+date: 2016-08-22
+changes:
+- change 'America/Los_Angeles' to 'PST8PDT' in a test, thanks @brinstarnetworks!
+---
 version: 1.11
 date:    2015-07-08
 changes:
